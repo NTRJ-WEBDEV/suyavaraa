@@ -14,15 +14,16 @@ const CommunityScreen = ({ navigation }) => {
         <Text style={styles.subtitle}>Browse community spaces, parent groups, and regional channels.</Text>
       </View>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Coming Soon</Text>
+        <Text style={styles.cardTitle}>Coming Soon 🌟</Text>
         <Text style={styles.cardText}>
           We are building a dedicated community channel experience for matrimony users.
           You will be able to join channels, chat with members, and connect with moderators.
         </Text>
       </View>
-      <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Premium')}>
-        <Text style={styles.actionText}>Unlock Community Access</Text>
-      </TouchableOpacity>
+      {/* TODO: Add referral/premium upsell here when billing is live */}
+      <View style={styles.noticeBox}>
+        <Text style={styles.noticeText}>Get early access by sharing your referral code with friends!</Text>
+      </View>
     </ScrollView>
   );
 };
@@ -77,6 +78,20 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 15,
     fontWeight: '700',
+  },
+  noticeBox: {
+    marginTop: 24,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 18,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+  },
+  noticeText: {
+    color: Colors.text,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '500',
   },
 });
 

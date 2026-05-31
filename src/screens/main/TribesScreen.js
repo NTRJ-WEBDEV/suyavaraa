@@ -38,9 +38,7 @@ const TribesScreen = ({ navigation }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      if (await checkIsAdmin(user.id)) {
-        await AsyncStorage.setItem('isPremium', 'true');
-      }
+      // NOTE: isPremium sourced from DB via ModeContext — no AsyncStorage write needed here.
 
       const { data: rows, error } = await supabase
         .from('user_tribes')
@@ -94,13 +92,9 @@ const TribesScreen = ({ navigation }) => {
   };
 
   const handleTribePress = (tribe) => {
-    const isUserTribe = userTribes.some(t => t.tribe.id === tribe.id);
-    if (isUserTribe || isPremium) {
-      navigation.navigate('TribeInner', { tribe, userMode: activeMode });
-    } else {
-      setSelectedTribe(tribe);
-      setShowPremiumModal(true);
-    }
+    // TODO: Re-add premium gate when billing is live.
+    // For launch: all users can access any tribe freely.
+    navigation.navigate('TribeInner', { tribe, userMode: activeMode });
   };
 
   if (loading) {
@@ -123,16 +117,7 @@ const TribesScreen = ({ navigation }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {!isPremium && (
-          <TouchableOpacity style={styles.premiumBanner} onPress={() => setShowPremiumModal(true)}>
-            <View style={styles.premiumIcon}><Text>⭐</Text></View>
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.premiumTitle}>Unlock All {itemType}</Text>
-              <Text style={styles.premiumDesc}>Go Premium to join and explore any {itemType.toLowerCase()}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
-          </TouchableOpacity>
-        )}
+        {/* TODO: Re-add referral/premium banner here when billing is live */}
 
         {userTribes.length > 0 && (
           <View style={styles.section}>
@@ -162,7 +147,7 @@ const TribesScreen = ({ navigation }) => {
               renderItem={({ item }) => (
                 <TribeCard
                   item={item}
-                  isLocked={!isPremium && !userTribes.some(t => t.tribe.id === item.id)}
+                  isLocked={false}
                   onPress={handleTribePress}
                 />
               )}
@@ -181,23 +166,7 @@ const TribesScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      <Modal visible={showPremiumModal} transparent animationType="fade">
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowPremiumModal(false)}>
-          <View style={styles.modalContent}>
-            <Text style={{ fontSize: 40, marginBottom: 16 }}>⭐</Text>
-            <Text style={styles.modalTitle}>Unlock Premium</Text>
-            <Text style={styles.modalText}>
-              Join "{selectedTribe?.name}" and explore all {itemType.toLowerCase()} with Premium membership.
-            </Text>
-            <TouchableOpacity style={styles.modalBtn} onPress={() => { setShowPremiumModal(false); navigation.navigate('Premium'); }}>
-              <Text style={styles.modalBtnText}>View Premium Plans</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowPremiumModal(false)} style={{ marginTop: 16 }}>
-              <Text style={{ color: Colors.textSecondary }}>Maybe Later</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+      {/* Premium modal removed for launch — will be re-added when billing is live */}
     </View>
   );
 };

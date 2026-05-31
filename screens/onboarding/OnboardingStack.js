@@ -1000,27 +1000,17 @@ const MatrimonyProfileScreen = ({ navigation }) => {
 // Tribe Zone Select Screen
 const TribeZoneSelectScreen = ({ navigation }) => {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [userMode, setUserMode] = useState('dating');
-  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const loadUserData = async () => {
       const mode = await AsyncStorage.getItem('userMode');
-      const { data: { user } } = await supabase.auth.getUser();
-      const premiumFlag = await AsyncStorage.getItem('isPremium') === 'true';
-      const isAdmin = await checkIsAdmin(user?.id);
-      const premium = premiumFlag || isAdmin;
-      if (isAdmin) {
-        await AsyncStorage.setItem('isPremium', 'true');
-      }
       setUserMode(mode || 'dating');
-      setIsPremium(premium);
     };
     loadUserData();
   }, []);
 
-  const maxSelections = isPremium ? 3 : 1;
+  const maxSelections = 3; // All users can select up to 3 at launch
   const items = userMode === 'dating' ? datingTribes : matrimonyZones;
   const itemType = userMode === 'dating' ? 'Tribe' : 'Zone';
 
@@ -1029,12 +1019,8 @@ const TribeZoneSelectScreen = ({ navigation }) => {
       setSelectedItems(selectedItems.filter(id => id !== itemId));
     } else {
       if (selectedItems.length >= maxSelections) {
-        if (!isPremium) {
-          setShowPremiumModal(true);
-        } else {
-          Alert.alert(`Maximum ${maxSelections} ${itemType}s`, 
-            `You can only select up to ${maxSelections} ${itemType}s`);
-        }
+        Alert.alert(`Maximum ${maxSelections} ${itemType}s`,
+          `You can select up to ${maxSelections} ${itemType}s`);
         return;
       }
       setSelectedItems([...selectedItems, itemId]);
@@ -1126,10 +1112,7 @@ const TribeZoneSelectScreen = ({ navigation }) => {
           Choose Your {itemType}s
         </Text>
         <Text style={styles.subtitle}>
-          {isPremium 
-            ? `Select up to 3 ${itemType}s that resonate with you`
-            : `Free users can select 1 ${itemType}. Upgrade to Premium for up to 3 selections.`
-          }
+          Select up to 3 {itemType}s that resonate with you
         </Text>
 
         <Text style={[styles.subtitle, { color: colors.primary, marginBottom: 8 }]}>
@@ -1153,42 +1136,7 @@ const TribeZoneSelectScreen = ({ navigation }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      <Modal
-        visible={showPremiumModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowPremiumModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>✨ Upgrade to Premium</Text>
-            <Text style={styles.modalText}>
-              Free users can select only 1 {itemType.toLowerCase()}. 
-              Upgrade to Premium to select up to 3 {itemType.toLowerCase()}s 
-              and unlock more meaningful matches!
-            </Text>
-
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => {
-                setShowPremiumModal(false);
-                console.log('Show premium plans');
-              }}
-            >
-              <Text style={styles.modalButtonText}>View Premium Plans</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.modalButton, styles.modalCloseButton]}
-              onPress={() => setShowPremiumModal(false)}
-            >
-              <Text style={[styles.modalButtonText, { color: colors.textSecondary }]}>
-                Maybe Later
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      {/* Premium modal removed for launch — will be re-added when billing is live */}
     </View>
   );
 };

@@ -765,7 +765,6 @@ const AccountSwitcher = ({ visible, onClose, currentMode, onSwitch, isPremium, c
                 { 
                   borderColor: currentMode === 'matrimony' ? matrimonyColors.primary : '#eee',
                   backgroundColor: currentMode === 'matrimony' ? matrimonyColors.primary + '10' : '#fff',
-                  opacity: !isPremium && currentMode === 'dating' ? 0.6 : 1
                 }
               ]}
               onPress={() => onSwitch('matrimony')}
@@ -778,11 +777,6 @@ const AccountSwitcher = ({ visible, onClose, currentMode, onSwitch, isPremium, c
                 <Text style={styles.switchAccountMode}>Serious & Tradition-focused</Text>
               </View>
               {currentMode === 'matrimony' && <Ionicons name="checkmark-circle" size={24} color={matrimonyColors.primary} />}
-              {!isPremium && currentMode === 'dating' && (
-                <View style={styles.premiumLock}>
-                  <Ionicons name="lock-closed" size={14} color="#666" />
-                </View>
-              )}
             </TouchableOpacity>
 
             {canUseAdminMode ? (
@@ -808,32 +802,32 @@ const AccountSwitcher = ({ visible, onClose, currentMode, onSwitch, isPremium, c
             ) : null}
           </View>
 
-          {!isPremium && !canUseAdminMode && (
-            <TouchableOpacity style={{ marginTop: 10, alignSelf: 'center' }} onPress={() => { onClose(); }}>
-              <Text style={{ color: matrimonyColors.primary, fontWeight: 'bold' }}>Premium users only can switch modes</Text>
-            </TouchableOpacity>
-          )}
+          {/* Mode switching is free for all users at launch */}
         </View>
       </TouchableOpacity>
     </Modal>
   );
 };
 
-const PremiumBanner = ({ onPress }) => {
+// TODO: Replace with full premium upsell banner when billing is live.
+const PremiumBanner = ({ onPress }) => null; // Disabled for launch
+
+// Shown to all users — encourages referrals instead of purchases
+const ReferralInviteBanner = ({ onPress }) => {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
       <LinearGradient
-        colors={['#D97706', '#F59E0B']}
+        colors={['#E91E63', '#9C27B0']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.premiumBannerInner}
       >
         <View style={styles.premiumIconContainer}>
-          <Ionicons name="star" size={24} color="#fff" />
+          <Ionicons name="gift" size={24} color="#fff" />
         </View>
         <View style={styles.premiumBannerTextContainer}>
-          <Text style={styles.premiumBannerTitle}>Premium Preview</Text>
-          <Text style={styles.premiumBannerSubtitle}>Billing is paused while release compliance is finalized</Text>
+          <Text style={styles.premiumBannerTitle}>Refer & Earn Premium</Text>
+          <Text style={styles.premiumBannerSubtitle}>Invite friends — earn 7 free days for each referral</Text>
         </View>
         <Ionicons name="chevron-forward" size={20} color="#fff" />
       </LinearGradient>
@@ -1030,17 +1024,8 @@ const ProfileScreen = ({ navigation }) => {
       return;
     }
 
-    if (!isPremium) {
-      Alert.alert(
-        'Premium Preview',
-        'Premium purchases are temporarily unavailable while billing and release compliance are being finalized.',
-        [
-          { text: 'OK', style: 'cancel' },
-          { text: 'View Preview', onPress: () => navigation.navigate('Premium') }
-        ]
-      );
-      return;
-    }
+    // TODO: Premium mode restriction will be re-enabled when billing is live.
+    // For launch: all users can freely switch modes.
 
     switchMode(targetMode);
     setShowSwitcher(false);
@@ -1158,9 +1143,8 @@ const ProfileScreen = ({ navigation }) => {
             </Text>
           </View>
 
-          {!isPremium && (
-            <PremiumBanner onPress={() => navigation.navigate('Premium')} />
-          )}
+          {/* Referral invite shown to all users instead of premium upsell */}
+          <ReferralInviteBanner onPress={() => navigation.navigate('Premium')} />
 
           {/* Photos Grid (Small Icons) */}
           <View style={{ marginBottom: 20 }}>

@@ -203,17 +203,17 @@ const CreateSuyamvaramScreen = ({ navigation }) => {
           />
         </View>
 
-        <View style={styles.premiumBanner}>
+        <View style={styles.infoBanner}>
           <LinearGradient
-            colors={['#FFFBEB', '#FEF3C7']}
+            colors={['#EFF6FF', '#DBEAFE']}
             style={styles.premiumGradient}
           >
             <View style={styles.premiumHeaderRow}>
-               <Ionicons name="star" size={20} color="#D97706" />
-               <Text style={styles.premiumTitle}>Premium Feature</Text>
+               <Ionicons name="information-circle" size={20} color="#1D4ED8" />
+               <Text style={[styles.premiumTitle, { color: '#1D4ED8' }]}>Admin-Reviewed Feature</Text>
             </View>
-            <Text style={styles.premiumDesc}>
-              This will be visible to all Matrimony Mode users. You will be able to review all submissions before connecting.
+            <Text style={[styles.premiumDesc, { color: '#1E40AF' }]}>
+              Your Suyamvaram will be visible to all Matrimony Mode users after admin approval. You can review all applicants before connecting.
             </Text>
           </LinearGradient>
         </View>

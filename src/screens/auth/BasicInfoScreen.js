@@ -141,6 +141,19 @@ const BasicInfoScreen = ({ navigation, route }) => {
       return;
     }
 
+    // Play Store / legal requirement: Suyavaraa is for adults 18+ only
+    const birthDate = new Date(normalizedDob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    if (age < 18) {
+      setError('You must be at least 18 years old to use Suyavaraa.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setWarning('');
