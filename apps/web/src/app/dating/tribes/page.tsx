@@ -1,0 +1,22 @@
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { AppShell } from '@/components/layout/AppShell'
+import { TribesGrid } from '@/components/tribes/TribesGrid'
+
+export default async function TribesPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const [{ data: profile }, { data: up }, { data: tribes }] = await Promise.all([
+    supabase.from('users').select('full_name, preferred_mode').eq('id', user.id).single(),
+    supabase.from('user_profiles').select('primary_photo_url').eq('user_id', user.id).single(),
+    supabase.from('tribes').select('id, name, description, cover_image_url, member_count, category').eq('is_active', true).order('member_count', { ascending: false }),
+  ])
+
+  return (
+    <AppShell user={{ name: profile?.full_name ?? null, photo: up?.primary_photo_url ?? null }} initialMode={profile?.preferred_mode ?? 'dating'}>
+      <TribesGrid tribes={tribes ?? []} userId={user.id} mode="dating" />
+    </AppShell>
+  )
+}

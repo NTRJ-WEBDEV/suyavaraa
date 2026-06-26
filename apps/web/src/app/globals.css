@@ -8,6 +8,29 @@
   --accent: #b45309;
   --accent-deep: #7c2d12;
   --muted: #6b4b3e;
+  --border: #e8d5c0;
+  --sidebar-bg: #1a0f0a;
+  --sidebar-text: #e8d5c0;
+
+  /* Default mode accent (overridden by data-mode) */
+  --mode-accent: #b45309;
+  --mode-accent-deep: #7c2d12;
+  --mode-accent-soft: #fdf6e3;
+  --mode-accent-ring: #b4530933;
+}
+
+[data-mode="dating"] {
+  --mode-accent: #e91e63;
+  --mode-accent-deep: #ad1457;
+  --mode-accent-soft: #fce4ec;
+  --mode-accent-ring: #e91e6333;
+}
+
+[data-mode="matrimony"] {
+  --mode-accent: #d4a017;
+  --mode-accent-deep: #a37a10;
+  --mode-accent-soft: #fdf6e3;
+  --mode-accent-ring: #d4a01733;
 }
 
 @theme inline {
@@ -18,6 +41,10 @@
   --color-accent: var(--accent);
   --color-accent-deep: var(--accent-deep);
   --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-mode-accent: var(--mode-accent);
+  --color-mode-accent-deep: var(--mode-accent-deep);
+  --color-mode-accent-soft: var(--mode-accent-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -43,4 +70,35 @@ a {
 
 ::selection {
   background: #f59e0b44;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* Utility classes for mode-aware accent */
+.btn-mode {
+  background-color: var(--mode-accent);
+  color: #fff;
+}
+.btn-mode:hover {
+  background-color: var(--mode-accent-deep);
+}
+.text-mode {
+  color: var(--mode-accent);
+}
+.bg-mode-soft {
+  background-color: var(--mode-accent-soft);
+}
+.ring-mode {
+  box-shadow: 0 0 0 2px var(--mode-accent-ring);
 }
