@@ -25,7 +25,6 @@ const { LinearGradient } = require('expo-linear-gradient');
 const { supabase } = require('../../supabase');
 const { uploadMedia, pickMedia } = require('../../src/utils/mediaUtils');
 const moderationService = require('../../src/services/moderationService');
-const deepfakeDetectionService = require('../../src/services/deepfakeDetectionService');
 
 const { width } = Dimensions.get('window');
 const { useMode } = require('../../context/ModeContext');
@@ -1479,27 +1478,6 @@ const EditProfileScreen = ({ navigation }) => {
         mother_tongue: motherTongue || null,
         about: about || null,
       }, { onConflict: 'user_id' });
-
-      // Safety scan for profile photos: deepfake + sexual imagery detection
-      const photosToScan = [primaryPhoto, ...additionalPhotos].filter(Boolean);
-      if (photosToScan.length > 0) {
-        const scanResults = await deepfakeDetectionService.scanUserProfile(user.id, photosToScan);
-        const flagged = scanResults.filter(s => ['deepfake', 'nsfw', 'suspicious'].includes(s.result));
-
-        if (flagged.length > 0) {
-          await supabase.from('reports').insert({
-            reporter_id: user.id,
-            target_id: user.id,
-            content_type: 'profile_photo',
-            reason: `AUTO-DETECTED profile risk: ${flagged[0].result} (${flagged[0].reasoning || 'No reason'})`,
-            category: flagged[0].result === 'deepfake' ? 'deepfake' : 'sexual_content',
-            severity: flagged[0].confidence > 0.8 ? 'critical' : 'high',
-            auto_flagged: true,
-            status: 'pending',
-            ai_analysis: JSON.stringify(flagged[0]),
-          });
-        }
-      }
 
       // Keep AsyncStorage in sync for quick offline reads
       await AsyncStorage.setItem('userData', JSON.stringify({

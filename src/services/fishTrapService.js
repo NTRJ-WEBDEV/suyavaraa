@@ -11,7 +11,6 @@
 
 const { supabase } = require('../../supabase');
 const { detectRedFlags } = require('../utils/redFlagPatterns');
-const aiResponderService = require('./aiResponderService');
 const contactInfoScrubbingService = require('./contactInfoScrubbingService');
 const matchingAlgorithmService = require('./matchingAlgorithmService');
 
@@ -316,23 +315,12 @@ class FishTrapService {
         await this.autoBanUser(interaction.user_id, redFlagResult);
       }
 
-      // Generate AI response
-      const decoyProfile = await this.getDecoyProfile(interaction.decoy_id);
-      const conversationHistory = await this.getConversationHistory(interactionId);
-
-      const aiResponse = await aiResponderService.generateResponse(
-        decoyProfile,
-        conversationHistory,
-        scrubbedResult.scrubbedMessage
-      );
-
-      // Save messages to database
+      // No automated decoy reply: the message is stored for admin review.
       await this.saveMessage(interactionId, 'user', userMessage, scrubbedResult.scrubbedMessage);
-      await this.saveMessage(interactionId, 'decoy', aiResponse.response, aiResponse.response);
 
       return {
         success: true,
-        response: aiResponse.response,
+        response: null,
         redFlags: redFlagResult,
         scrubbed: scrubbedResult.wasModified
       };

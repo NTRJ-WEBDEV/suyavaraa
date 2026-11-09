@@ -256,14 +256,14 @@ const ChatScreen = ({ route, navigation }) => {
           const userMessage = {
             id: Date.now().toString(),
             sender_id: currentUserId,
-            message_text: result.scrubbed ? result.response : text, // Show scrubbed version if modified
+            message_text: text,
             message_type: 'text',
             created_at: new Date().toISOString()
           };
           setMessages(prev => [...prev, userMessage]);
 
-          // Add decoy response after a short delay
-          setTimeout(() => {
+          // Add decoy response after a short delay, if one was generated
+          if (result.response) setTimeout(() => {
             const decoyMessage = {
               id: (Date.now() + 1).toString(),
               sender_id: 'decoy',
