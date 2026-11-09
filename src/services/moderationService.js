@@ -1,6 +1,4 @@
 const { supabase } = require('../../supabase');
-const { aiResponderService } = require('./aiResponderService');
-const deepfakeDetectionService = require('./deepfakeDetectionService');
 
 class ModerationService {
   constructor() {
@@ -38,47 +36,6 @@ class ModerationService {
           severity: 'medium',
           reason: 'profanity_or_harassment',
           scrubbed: this.scrubText(text)
-        };
-      }
-
-      // 2. AI check (DeepSeek) for context-based moderation
-      const prompt = `Moderation task: Analyze this text for policy violations.
-
-Check for:
-1) Sexual harassment / sexual coercion / explicit sexual solicitation
-2) Sexual content
-3) Hate speech
-4) Threats / violence
-5) Scam / fraud patterns
-6) General abusive harassment
-
-Return STRICT JSON:
-{
-  "safe": true,
-  "category": "general|sexual_content|harassment|spam|scam|violence|hate_speech",
-  "severity": "low|medium|high|critical",
-  "reason": "short reason"
-}
-
-Text: "${text}"`;
-      
-      const response = await aiResponderService.generateRawResponse(prompt);
-
-      let parsed;
-      try {
-        const jsonMatch = response && response.match(/\{[\s\S]*\}/);
-        parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-      } catch {
-        parsed = null;
-      }
-
-      if (parsed && parsed.safe === false) {
-        return {
-          safe: false,
-          category: parsed.category || 'general',
-          severity: parsed.severity || 'medium',
-          reason: parsed.reason || 'policy_violation',
-          scrubbed: '[Content blocked]'
         };
       }
 
@@ -145,20 +102,7 @@ Text: "${text}"`;
         };
       }
 
-      // Scan media for deepfake / sexual imagery
-      const mediaScan = await deepfakeDetectionService.scanPostImages(userId, mediaUrls);
-      if (!mediaScan.safe) {
-        const first = mediaScan.blockedImages[0];
-        return {
-          safe: false,
-          shouldAutoRemove: true,
-          reason: first.reasoning || 'Unsafe visual content detected',
-          category: first.result === 'deepfake' ? 'deepfake' : 'sexual_content',
-          severity: first.confidence > 0.8 ? 'critical' : 'high',
-          blockedImages: mediaScan.blockedImages,
-        };
-      }
-
+      // Media is not auto-scanned: all photos go through the admin photo approval queue.
       return { safe: true };
     } catch (error) {
       console.error('moderatePost error:', error);
